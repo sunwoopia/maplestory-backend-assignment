@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Event, EventDocument } from './event.schema';
+import { CreateEventDto } from './event.dto';
 
 @Injectable()
 export class EventService {
@@ -9,12 +10,12 @@ export class EventService {
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
   ) {}
 
-  async createEvent(data: {
-    title: string;
-    description?: string;
-    rewardType: string;
-    createdBy: string;
-  }) {
+  async getEvents(status?: string): Promise<Event[]> {
+    const filter = status ? { status } : {};
+    return this.eventModel.find(filter).sort({ createdAt: -1 }).exec();
+  }
+
+  async createEvent(data: CreateEventDto): Promise<Event> {
     return this.eventModel.create(data);
   }
 }

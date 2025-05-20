@@ -21,7 +21,7 @@ export class UserController {
       body.password,
       body.role,
     );
-    return { message: 'User created', userId: user._id };
+    return { message: '유저가 생성되었습니다.', userId: user._id };
   }
 
   @Post('login')
@@ -29,6 +29,7 @@ export class UserController {
     return this.userService.login(body.email, body.password);
   }
 
+  // 유저의 Role Update
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('Admin')
   @Patch('role/:userId')

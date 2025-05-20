@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
@@ -14,6 +15,12 @@ import { ApproveRewardDto, RequestRewardDto } from './reward.dto';
 @Controller('rewards')
 export class RewardController {
   constructor(private readonly rewardService: RewardService) {}
+
+  @Get('')
+  @UseGuards(JwtAuthGuard)
+  async getMyRewards(@Request() req) {
+    return this.rewardService.getUserRewards(req.user.userId);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('request')

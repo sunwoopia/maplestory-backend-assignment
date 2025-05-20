@@ -1,54 +1,51 @@
 import {
   Controller,
-  Param,
-  Patch,
   Post,
+  Patch,
+  Param,
   Req,
   Res,
   UseGuards,
-  Get,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JwtAuthGuard, RolesGuard, Roles } from 'libs/auth';
 import { GatewayServerService } from '../gateway-server.service';
 
-@Controller('rewards')
-export class GatewayRewardsController {
+@Controller('auth')
+export class GatewayUserController {
   constructor(private readonly gatewayServerService: GatewayServerService) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get('')
-  async proxyMyRewards(@Req() req: Request, @Res() res: Response) {
+  @Post('/')
+  async proxyRegister(@Req() req: Request, @Res() res: Response) {
     return this.gatewayServerService.proxyRequest(
-      '/rewards',
-      'EVENT_SERVER_URL',
+      '/auth',
+      'AUTH_SERVER_URL',
       req,
       res,
     );
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('request')
-  async proxyRequest(@Req() req: Request, @Res() res: Response) {
+  @Post('/login')
+  async proxyLogin(@Req() req: Request, @Res() res: Response) {
     return this.gatewayServerService.proxyRequest(
-      '/rewards/request',
-      'EVENT_SERVER_URL',
+      '/auth/login',
+      'AUTH_SERVER_URL',
       req,
       res,
     );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Operator', 'Auditor')
-  @Patch('approve/:id')
-  async proxyApprove(
-    @Param('id') id: string,
+  @Roles('Admin')
+  @Patch('role/:userId')
+  async proxyUpdateUserRole(
+    @Param('userId') userId: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
     return this.gatewayServerService.proxyRequest(
-      `/rewards/approve/${id}`,
-      'EVENT_SERVER_URL',
+      `/auth/role/${userId}`,
+      'AUTH_SERVER_URL',
       req,
       res,
     );

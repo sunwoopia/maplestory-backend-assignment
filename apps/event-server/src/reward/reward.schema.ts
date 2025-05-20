@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type RewardRequestDocument = RewardRequest & Document;
 
@@ -13,11 +13,10 @@ export class RewardRequest {
   @Prop({ required: true })
   eventId: string;
 
-  @Prop({
-    type: String,
-    enum: ['Pending', 'OnHold', 'Approved', 'Rejected'], // 보상요청, 임시보류, 승인, 거절
-    default: 'Pending',
-  })
+  @Prop({ type: Types.ObjectId, ref: 'RewardDefinition', required: true })
+  rewardDefinitionId: Types.ObjectId;
+
+  @Prop({ default: 'Pending' })
   status: RewardStatus;
 
   @Prop()

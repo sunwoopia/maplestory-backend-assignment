@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type EventDocument = Event & Document;
 export type EventStatus = 'pending' | 'active' | 'ended';
@@ -33,6 +33,25 @@ export class Event {
     default: 'pending',
   })
   status: EventStatus;
+
+  @Prop({
+    type: [
+      {
+        key: { type: String, required: true }, // 달성 조건의 종류 ex) 'login'
+        operator: { type: String, required: true }, // 달성 조건의 연산자 ex) '>='
+        value: { type: String, required: true }, // 달성 조건의 value ex) '3'
+      },
+    ],
+    default: [],
+  })
+  conditions: {
+    key: string;
+    operator: string;
+    value: string | number;
+  }[];
+
+  @Prop({ type: Types.ObjectId, ref: 'RewardDefinition' })
+  reward: Types.ObjectId;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

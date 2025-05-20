@@ -1,16 +1,48 @@
-version: '3.8'
-
 services:
-  mongodb:
-    image: mongo:6
-    container_name: mongodb
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: secret
     volumes:
-      - mongo_data:/data/db
+      - mongo-data:/data/db
+
+  auth-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-server
+    command: pnpm run start:auth
+    ports:
+      - "5001:5001"
+    env_file: .env
+    depends_on:
+      - mongo
+
+  event-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: event-server
+    command: pnpm run start:event
+    ports:
+      - "5003:5003"
+    env_file: .env
+    depends_on:
+      - mongo
+
+  gateway-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gateway-server
+    command: pnpm run start:gateway
+    ports:
+      - "5002:5002"
+    env_file: .env
+    depends_on:
+      - auth-server
+      - event-server
 
 volumes:
-  mongo_data:
+  mongo-data:
