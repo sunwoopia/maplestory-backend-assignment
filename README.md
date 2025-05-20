@@ -135,7 +135,7 @@ docker-compose up --build
 
 ---
 
-### 📝 RewardRequest - 보상 요청 - 이벤트와 보상 종류의 대한 정보를 담은 보상 요청
+### 📝 RewardRequest - 이벤트와 보상 종류의 대한 정보를 담은 보상 요청
 
 | 필드명             | 타입                                         | 설명 |
 |--------------------|----------------------------------------------|------|
@@ -152,20 +152,37 @@ docker-compose up --build
 ## 🔗 서비스 간 관계도
 
 ```plaintext
-[User]
-   ├── 인증 및 로그인 → [Auth Server]
-   ├── 활동 기록     → [UserActivity] ← 조건 평가 ← [Event]
-   └── 보상 신청     → [RewardRequest] ────────▶ [RewardDefinition]
-
-[Event]
-   ├── 조건 정의 + 보상 연결 → [RewardDefinition]
-   └── 유저 대상 이벤트 제공
-
+[Client]
+   │
+   ▼
 [Gateway Server]
-   └─ API 요청 인증 및 라우팅 처리
+   │
+   ├─ JwtAuthGuard (토큰 검증)
+   ├─ RoleGuard (권한 검증: Admin, Operator 등)
+   │
+   ├────▶ [Auth Server]
+   │        └── 로그인, 회원가입, JWT 발급
+   │
+   └────▶ [Event Server]
+            └── 인증된 유저만 이벤트 조회 / 보상 신청 가능
 ```
 
 ---
+
+### ✅ 인증/인가 설계 포인트
+
+- `JwtAuthGuard`: Gateway에서 JWT 유효성을 검증하여 인증되지 않은 요청 차단
+- `RoleGuard`: 요청한 API가 특정 역할(`Admin`, `Operator` 등)만 접근 가능한 경우 체크
+- 인증은 **Gateway에서 일괄적으로 수행**하며, 실제 서비스 접근은 인증된 요청만 가능
+
+---
+
+## 🔍 설계 의도 및 기술적 고려 사항
+
+- `RewardDefinition`과 `RewardRequest`를 분리해 보상 설계와 지급 요청의 책임을 명확히 분리했습니다.
+- `UserActivity`는 모든 조건 평가의 기반이 되는 유저 행동 지표를 기록하며, 조건이 늘어나더라도 스키마 수정 없이 확장 가능한 동적 Metrics 사용
+- `Gateway Server`는 인증과 역할 기반 라우팅을 담당하여, 마이크로서비스 간 관심사를 분리하고, 관리 포인트를 통합했습니다.
+- NestJS + pnpm + Docker를 통해 누구나 동일한 실행 환경을 빠르게 구성할 수 있습니다.
 
 ## 📮 문의
 
