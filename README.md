@@ -1,73 +1,176 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# 🗺️ maplestory-backend-assignment
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+메이플스토리 월드 백엔드 과제용 NestJS 모노레포 프로젝트입니다. Gateway, Auth, Event 세 개의 마이크로서비스로 구성되어 있으며, Docker + pnpm 기반으로 누구나 쉽게 실행할 수 있도록 설계하였습니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 기술 스택
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js 18
+- NestJS (Monorepo)
+- MongoDB
+- pnpm
+- Docker & Docker Compose
 
-## Installation
+---
+
+## 📁 폴더 구조
 
 ```bash
-$ pnpm install
+maplestory-backend-assignment/
+├── apps/
+│   ├── auth/        # 인증 서비스
+│   ├── gateway/     # API 게이트웨이
+│   └── event/       # 이벤트/보상 관리
+├── libs/            # 공통 라이브러리
+├── .env             # 환경 변수 설정 (로컬에서 직접 작성)
+├── Dockerfile       # 공통 Docker 빌드 파일
+├── docker-compose.yml
+├── package.json     # 루트 실행 스크립트
+└── pnpm-lock.yaml
 ```
 
-## Running the app
+---
+
+## ⚙️ .env 설정 방법
+
+`.env` 파일은 아래 내용을 참고하여 **루트에 직접 생성**해주세요:
+
+```env
+# 서버별 포트
+AUTH_PORT=5001
+GATEWAY_PORT=5002
+EVENT_PORT=5003
+
+# MongoDB URI
+MONGO_URI=mongodb://root:secret@localhost:27017/auth-db?authSource=admin
+
+# 서비스별 내부 접근 URL (Docker Compose 기준)
+AUTH_SERVER_URL=http://auth-server:5001
+EVENT_SERVER_URL=http://event-server:5003
+
+# JWT 설정
+JWT_SECRET=dev-secret-maple-jwt-2025
+```
+
+> 🔐 실 서비스에서는 민감 정보 보호를 위해 `.env`를 `.gitignore`에 추가해야 합니다.
+
+---
+
+## 🧪 실행 방법
 
 ```bash
-# development
-$ pnpm run start
+# 1. 레포 클론
+git clone https://github.com/your-org/maplestory-backend-assignment.git
+cd maplestory-backend-assignment
 
-# watch mode
-$ pnpm run start:dev
+# 2. .env 파일 생성 (위 내용 복사해서 작성)
 
-# production mode
-$ pnpm run start:prod
+# 3. 도커 실행
+docker-compose up --build
 ```
 
-## Test
+서비스는 아래 주소에서 접근 가능합니다:
 
-```bash
-# unit tests
-$ pnpm run test
+- Auth Server: http://localhost:5001
+- Gateway Server: http://localhost:5002
+- Event Server: http://localhost:5003
+- MongoDB: localhost:27017
 
-# e2e tests
-$ pnpm run test:e2e
+---
 
-# test coverage
-$ pnpm run test:cov
+## 🏗️ 설계 배경 및 구성 설명
+
+- **Monorepo + pnpm**: 각 서비스는 `apps/` 하위에 구성되며, 의존성 관리와 실행을 루트에서 통합합니다.
+- **Docker 단일 이미지 전략**: 하나의 `Dockerfile`로 빌드한 이미지를 `docker-compose`에서 각 서비스에 공유합니다.
+- **포트 구성**: auth/gateway/event를 각각 5001/5002/5003 포트로 분리하고, 내부 접근 주소도 환경변수로 통일했습니다.
+- **MongoDB**: 인증 및 보상 데이터를 위해 MongoDB를 사용하며 Docker로 함께 배포됩니다.
+
+---
+
+## 🧩 데이터 스키마 구조
+
+### 🔐 User (인증 서버)
+
+| 필드명   | 타입                              | 설명 |
+|----------|-----------------------------------|------|
+| email    | string (unique)                   | 이메일 |
+| password | string                            | 비밀번호 |
+| role     | 'User' \| 'Operator' \| 'Auditor' \| 'Admin' (optional) | 역할 |
+
+---
+
+### 🧠 UserActivity (이벤트 서버)
+
+| 필드명   | 타입              | 설명 |
+|----------|-------------------|------|
+| userId   | string (unique)   | 사용자 ID |
+| metrics  | Record<string, any> | 조건별 활동 기록 (ex: loginCount 등) |
+
+> `metrics`는 `Event.conditions`와 연동되어, 이벤트 조건 달성 여부를 평가하는 기준으로 사용됩니다.
+
+---
+
+### 🎁 RewardDefinition
+
+| 필드명   | 타입                              | 설명 |
+|----------|-----------------------------------|------|
+| name     | string                            | 보상 이름 |
+| type     | 'coupon' \| 'cash' \| 'points' \| 'item' | 보상 종류 |
+| value    | string                            | 보상 값 |
+| method   | 'auto' \| 'manual'                | 지급 방식 (기본값: manual) |
+
+---
+
+### 📦 Event
+
+| 필드명      | 타입                  | 설명 |
+|-------------|-----------------------|------|
+| title       | string                | 이벤트 제목 |
+| description | string (optional)     | 설명 |
+| rewardType  | string                | 보상 타입 |
+| rewardValue | string (optional)     | 보상 값 |
+| startDate   | Date (optional)       | 시작일 |
+| endDate     | Date (optional)       | 종료일 |
+| createdBy   | string                | 작성자 ID |
+| status      | 'pending' \| 'active' \| 'ended' | 상태 |
+| conditions  | Array<{ key, operator, value }> | 달성 조건 |
+| reward      | ObjectId → RewardDefinition 참조 | 연결된 보상 정의 |
+
+---
+
+### 📝 RewardRequest
+
+| 필드명             | 타입                                         | 설명 |
+|--------------------|----------------------------------------------|------|
+| userId             | string                                       | 사용자 ID |
+| eventId            | string                                       | 이벤트 ID |
+| rewardDefinitionId | ObjectId → RewardDefinition 참조             | 요청한 보상 |
+| status             | 'Pending' \| 'OnHold' \| 'Approved' \| 'Rejected' | 상태 |
+| processedBy        | string (optional)                            | 처리자 |
+| processedAt        | Date (optional)                              | 처리 시각 |
+| reason             | string (optional)                            | 거절 사유 등 |
+
+---
+
+## 🔗 서비스 간 관계도
+
+```plaintext
+[User]
+   ├── 인증 및 로그인 → [Auth Server]
+   ├── 활동 기록     → [UserActivity] ← 조건 평가 ← [Event]
+   └── 보상 신청     → [RewardRequest] ────────▶ [RewardDefinition]
+
+[Event]
+   ├── 조건 정의 + 보상 연결 → [RewardDefinition]
+   └── 유저 대상 이벤트 제공
+
+[Gateway Server]
+   └─ API 요청 인증 및 라우팅 처리
 ```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📮 문의
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+과제 관련 질문은 프로젝트 제출 플랫폼 혹은 메일을 통해 전달해 주세요.
