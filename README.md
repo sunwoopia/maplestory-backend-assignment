@@ -84,6 +84,13 @@ docker-compose up --build
 
 ---
 
+## 🔍 설계 의도 및 기술적 고려 사항
+
+- `RewardDefinition`과 `RewardRequest`를 분리해 보상 설계와 지급 요청의 책임을 명확히 분리했습니다.
+- `UserActivity`는 모든 조건 평가의 기반이 되는 유저 행동 지표를 기록하며, 조건이 늘어나더라도 스키마 수정 없이 확장 가능한 동적 Metrics 사용
+- `Gateway Server`는 인증과 역할 기반 라우팅을 담당하여, 마이크로서비스 간 관심사를 분리하고, 관리 포인트를 통합했습니다.
+- NestJS + pnpm + Docker를 통해 누구나 동일한 실행 환경을 빠르게 구성할 수 있습니다.
+
 ## 🧩 데이터 스키마 구조
 
 ### 🔐 User (인증 서버) - 기본적인 유저의 인증 및 권한의 역할만을 사용하기 위해 우선 Email, Password, Role 3가지로만 구분
@@ -176,13 +183,6 @@ docker-compose up --build
 - 인증은 **Gateway에서 일괄적으로 수행**하며, 실제 서비스 접근은 인증된 요청만 가능
 
 ---
-
-## 🔍 설계 의도 및 기술적 고려 사항
-
-- `RewardDefinition`과 `RewardRequest`를 분리해 보상 설계와 지급 요청의 책임을 명확히 분리했습니다.
-- `UserActivity`는 모든 조건 평가의 기반이 되는 유저 행동 지표를 기록하며, 조건이 늘어나더라도 스키마 수정 없이 확장 가능한 동적 Metrics 사용
-- `Gateway Server`는 인증과 역할 기반 라우팅을 담당하여, 마이크로서비스 간 관심사를 분리하고, 관리 포인트를 통합했습니다.
-- NestJS + pnpm + Docker를 통해 누구나 동일한 실행 환경을 빠르게 구성할 수 있습니다.
 
 ## 📮 문의
 
