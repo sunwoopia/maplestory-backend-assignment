@@ -1,4 +1,4 @@
-# 🗺️ maplestory-backend-assignment
+# 🗺️ Maplestory-Backend-Assignment
 
 메이플스토리 월드 백엔드 과제용 NestJS 모노레포 프로젝트입니다. Gateway, Auth, Event 세 개의 마이크로서비스로 구성되어 있으며, Docker + pnpm 기반으로 누구나 쉽게 실행할 수 있도록 설계하였습니다.
 
@@ -53,15 +53,13 @@ EVENT_SERVER_URL=http://event-server:5003
 JWT_SECRET=dev-secret-maple-jwt-2025
 ```
 
-> 🔐 실 서비스에서는 민감 정보 보호를 위해 `.env`를 `.gitignore`에 추가해야 합니다.
-
 ---
 
 ## 🧪 실행 방법
 
 ```bash
-# 1. 레포 클론
-git clone https://github.com/your-org/maplestory-backend-assignment.git
+# 1. Repository Clone
+git clone https://github.com/sunwoopia/maplestory-backend-assignment.git
 cd maplestory-backend-assignment
 
 # 2. .env 파일 생성 (위 내용 복사해서 작성)
@@ -70,7 +68,7 @@ cd maplestory-backend-assignment
 docker-compose up --build
 ```
 
-서비스는 아래 주소에서 접근 가능합니다:
+서비스는 아래 주소에서 접근 가능하고 GateWay Server에 요청을 통해 다른 서비스에 접근 가능합니다.
 
 - Auth Server: http://localhost:5001
 - Gateway Server: http://localhost:5002
@@ -81,16 +79,14 @@ docker-compose up --build
 
 ## 🏗️ 설계 배경 및 구성 설명
 
-- **Monorepo + pnpm**: 각 서비스는 `apps/` 하위에 구성되며, 의존성 관리와 실행을 루트에서 통합합니다.
-- **Docker 단일 이미지 전략**: 하나의 `Dockerfile`로 빌드한 이미지를 `docker-compose`에서 각 서비스에 공유합니다.
+- **MSA + Monorepo + pnpm**: 각 서비스는 `apps/` 하위에 구성되며, 의존성 관리와 실행을 루트에서 통합합니다.
 - **포트 구성**: auth/gateway/event를 각각 5001/5002/5003 포트로 분리하고, 내부 접근 주소도 환경변수로 통일했습니다.
-- **MongoDB**: 인증 및 보상 데이터를 위해 MongoDB를 사용하며 Docker로 함께 배포됩니다.
 
 ---
 
 ## 🧩 데이터 스키마 구조
 
-### 🔐 User (인증 서버)
+### 🔐 User (인증 서버) - 기본적인 유저의 인증 및 권한의 역할만을 사용하기 위해 우선 Email, Password, Role 3가지로만 구분
 
 | 필드명   | 타입                              | 설명 |
 |----------|-----------------------------------|------|
@@ -100,7 +96,7 @@ docker-compose up --build
 
 ---
 
-### 🧠 UserActivity (이벤트 서버)
+### 🧠 UserActivity (이벤트 서버) - 유저가 하는 활동을 기록 Metrics를 사용하여 유동적인 유저 조건을 추가 가능하게 설계
 
 | 필드명   | 타입              | 설명 |
 |----------|-------------------|------|
@@ -111,7 +107,7 @@ docker-compose up --build
 
 ---
 
-### 🎁 RewardDefinition
+### 🎁 RewardDefinition - 기본적인 보상의 정보
 
 | 필드명   | 타입                              | 설명 |
 |----------|-----------------------------------|------|
@@ -122,7 +118,7 @@ docker-compose up --build
 
 ---
 
-### 📦 Event
+### 📦 Event - 이벤트의 정보를 가지고 있으며 상태와 달성 조건, 연결된 보상을 포함함
 
 | 필드명      | 타입                  | 설명 |
 |-------------|-----------------------|------|
@@ -139,7 +135,7 @@ docker-compose up --build
 
 ---
 
-### 📝 RewardRequest
+### 📝 RewardRequest - 보상 요청 - 이벤트와 보상 종류의 대한 정보를 담은 보상 요청
 
 | 필드명             | 타입                                         | 설명 |
 |--------------------|----------------------------------------------|------|
@@ -173,4 +169,4 @@ docker-compose up --build
 
 ## 📮 문의
 
-과제 관련 질문은 프로젝트 제출 플랫폼 혹은 메일을 통해 전달해 주세요.
+과제 관련 질문은 sunrain1223@gmail.com을 통해 부탁드립니다.
